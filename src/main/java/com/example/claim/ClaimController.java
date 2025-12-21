@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.claim.dto.ClaimResponse;
 import com.example.claim.dto.CreateClaimRequest;
 import com.example.claim.dto.CreateUpdateResponse;
 import com.example.claim.dto.UpdateClaimRequest;
@@ -32,9 +33,16 @@ public class ClaimController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    // @GetMapping
+    // public ResponseEntity<List<Claim>> getAllClaims() {
+    //     List<Claim> response = claimService.getAllClaims();
+    //     return ResponseEntity.ok(response);
+    // }
+
     @GetMapping
-    public ResponseEntity<List<Claim>> getAllClaims() {
-        List<Claim> response = claimService.getAllClaims();
+    public ResponseEntity<List<ClaimResponse>> getAllClaims(){
+        // List<ClaimResponse> response = claimService.getAllClaims();
+        List<ClaimResponse> response = claimService.getAllClaimsBatch();
         return ResponseEntity.ok(response);
     }
 

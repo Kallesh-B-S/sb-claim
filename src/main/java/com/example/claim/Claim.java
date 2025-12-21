@@ -21,6 +21,8 @@ public class Claim {
     @Column(nullable = false)
     private Integer customerId;
 
+    private String claimNumber;
+
     // @Column(unique = true, nullable = false)
     // private String claimNumber; // e.g., CLM-100234
 
