@@ -16,6 +16,10 @@ public class ClaimResponse {
 
     private String claimNumber;
 
+    private Integer requestedAmount;
+
+    private String description;
+
     private String status;
 
     private String remarks;

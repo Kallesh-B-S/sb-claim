@@ -6,6 +6,8 @@ import lombok.Data;
 public class CreateClaimRequest {
     private Integer policyId;
     private Integer customerId;
-    private String status;
-    private String remarks;
+    private Integer requestedAmount;
+    private String description;
+    // private String status;
+    // private String remarks;
 }

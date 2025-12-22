@@ -23,6 +23,10 @@ public class Claim {
 
     private String claimNumber;
 
+    private Integer requestedAmount;
+
+    private String description;
+
     // @Column(unique = true, nullable = false)
     // private String claimNumber; // e.g., CLM-100234
 

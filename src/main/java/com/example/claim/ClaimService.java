@@ -1,8 +1,5 @@
 package com.example.claim;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.stream.Collectors;
 import java.util.*;
 
@@ -57,8 +54,10 @@ public class ClaimService {
         Claim claim = new Claim();
         claim.setPolicyId(requestBody.getPolicyId());
         claim.setCustomerId(requestBody.getCustomerId());
-        claim.setStatus(requestBody.getStatus());
-        claim.setRemarks(requestBody.getRemarks());
+        claim.setStatus("SUBMITTED");
+        claim.setRemarks("Claim Submitted");
+        claim.setRequestedAmount(requestBody.getRequestedAmount());
+        claim.setDescription(requestBody.getDescription());
 
         Claim savedClaim = claimDao.save(claim);
 
@@ -74,7 +73,7 @@ public class ClaimService {
     // return claimDao.findAll();
     // }
 
-    public List<ClaimResponse> getAllClaims() {
+    public List<ClaimResponse> getAllClaimsWithPolicy() {
 
         List<Claim> claims = claimDao.findAll();
 
@@ -154,6 +153,8 @@ public class ClaimService {
             response.setClaimNumber(claim.getClaimNumber());
             response.setStatus(claim.getStatus());
             response.setRemarks(claim.getRemarks());
+            response.setRequestedAmount(claim.getRequestedAmount());
+            response.setDescription(claim.getDescription());
 
             // Get from the map (O(1) lookup) instead of making a network call
             response.setPolicy(finalPolicyMap.get(claim.getPolicyId()));
@@ -181,6 +182,10 @@ public class ClaimService {
 
     public List<Claim> getClaimBycustomerId(Integer customerId) {
         return claimDao.findByCustomerId(customerId);
+    }
+
+    public List<Claim> getAllClaims() {
+        return claimDao.findAll();
     }
 
 }

@@ -39,12 +39,18 @@ public class ClaimController {
     //     return ResponseEntity.ok(response);
     // }
 
-    @GetMapping
-    public ResponseEntity<List<ClaimResponse>> getAllClaims(){
+    @GetMapping("allClaimsWithPolicy")
+    public ResponseEntity<List<ClaimResponse>> getAllClaimsWithPolicy(){
         // List<ClaimResponse> response = claimService.getAllClaims();
         List<ClaimResponse> response = claimService.getAllClaimsBatch();
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping
+    public ResponseEntity<List<Claim>> getAllClaims(){
+        List<Claim> response = claimService.getAllClaims();
+        return ResponseEntity.ok(response);
+    } 
 
     @GetMapping("{id}")
     public ResponseEntity<Claim> getClaimById(@Valid @PathVariable("id") Integer claimId) {
