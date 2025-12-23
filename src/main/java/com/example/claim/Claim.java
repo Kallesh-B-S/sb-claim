@@ -37,7 +37,7 @@ public class Claim {
     // private BigDecimal claimAmount;
     // private BigDecimal approvedAmount;
 
-    // private LocalDate incidentDate;
+    private LocalDate incidentDate;
     // private LocalDate filedDate;
 
     // SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED, PAID

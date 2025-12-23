@@ -58,6 +58,7 @@ public class ClaimService {
         claim.setRemarks("Claim Submitted");
         claim.setRequestedAmount(requestBody.getRequestedAmount());
         claim.setDescription(requestBody.getDescription());
+        claim.setIncidentDate(requestBody.getIncidentDate());
 
         Claim savedClaim = claimDao.save(claim);
 
