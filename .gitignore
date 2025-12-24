@@ -61,3 +61,5 @@ tmp/
 *.class
 *.zip
 *.tar.gz
+
+uploads/

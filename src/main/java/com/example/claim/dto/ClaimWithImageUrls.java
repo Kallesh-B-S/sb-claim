@@ -1,5 +1,6 @@
 package com.example.claim.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -11,8 +12,8 @@ public class ClaimWithImageUrls {
     private Integer policyId;
     private Integer customerId;
     private String claimNumber;
-    private Integer requestedAmount;
-    private Integer approvedAmount;
+    private BigDecimal requestedAmount;
+    private BigDecimal approvedAmount;
     private String description;
     private LocalDate incidentDate;
     private String status;

@@ -218,6 +218,7 @@ public class ClaimService {
         claimWithImageUrls.setCustomerId(claim.getCustomerId());
         claimWithImageUrls.setClaimNumber(claim.getClaimNumber());
         claimWithImageUrls.setRequestedAmount(claim.getRequestedAmount());
+        claimWithImageUrls.setApprovedAmount(claim.getApprovedAmount());
         claimWithImageUrls.setDescription(claim.getDescription());
         claimWithImageUrls.setIncidentDate(claim.getIncidentDate());
         claimWithImageUrls.setStatus(claim.getStatus());

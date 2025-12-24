@@ -1,5 +1,6 @@
 package com.example.claim.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -18,7 +19,7 @@ public class CreateClaimRequest {
 
     @NotNull(message = "Requested amount is required")
     @Positive(message = "Requested amount must be greater than zero")
-    private Integer requestedAmount;
+    private BigDecimal requestedAmount;
 
     @NotBlank(message = "Description cannot be empty")
     @Size(max = 500, message = "Description cannot exceed 500 characters")

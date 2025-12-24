@@ -16,7 +16,8 @@ public class ClaimResponse {
 
     private String claimNumber;
 
-    private Integer requestedAmount;
+    private BigDecimal requestedAmount;
+    private BigDecimal approvedAmount;
 
     private String description;
 
