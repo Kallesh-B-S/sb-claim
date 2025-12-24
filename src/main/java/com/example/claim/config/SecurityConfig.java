@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .requestMatchers("/claim/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/claim/**").permitAll()
                         .requestMatchers("/claim/**").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().authenticated());
 
         return http.build();

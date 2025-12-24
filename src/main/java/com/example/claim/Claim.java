@@ -24,6 +24,7 @@ public class Claim {
     private String claimNumber;
 
     private Integer requestedAmount;
+    private Integer approvedAmount;
 
     private String description;
 

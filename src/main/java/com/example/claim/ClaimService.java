@@ -1,6 +1,13 @@
 package com.example.claim;
 
 import java.util.stream.Collectors;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.claim.dto.ClaimResponse;
+import com.example.claim.dto.ClaimWithImageUrls;
 import com.example.claim.dto.CreateClaimRequest;
 import com.example.claim.dto.CreateUpdateResponse;
 import com.example.claim.dto.Policy;
@@ -32,8 +41,11 @@ public class ClaimService {
     @Autowired
     private RestClient restClient;
 
+    @Autowired
+    private ClaimImageDao claimImageDao;
+
     @Transactional
-    public CreateUpdateResponse createClaim(CreateClaimRequest requestBody) {
+    public CreateUpdateResponse createClaim(CreateClaimRequest requestBody, List<MultipartFile> images) {
 
         String customerUrl = "http://localhost:8766/customer/" + requestBody.getCustomerId();
         String policyUrl = "http://localhost:8766/customer/" + requestBody.getCustomerId();
@@ -67,7 +79,40 @@ public class ClaimService {
 
         claimDao.save(savedClaim);
 
+        // 3. Handle Images
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile file : images) {
+                // Skip empty files if any
+                if (file.isEmpty())
+                    continue;
+
+                String path = saveFileToDisk(file, savedClaim.getId());
+
+                ClaimImage img = new ClaimImage();
+                img.setFilePath(path);
+                img.setClaimId(savedClaim.getId());
+                claimImageDao.save(img);
+            }
+        }
+
         return new CreateUpdateResponse(savedClaim.getId(), "Claim Created Successfully");
+    }
+
+    private String saveFileToDisk(MultipartFile file, Integer claimId) {
+        try {
+            String uploadDir = "uploads/claims/" + claimId + "/";
+            File dir = new File(uploadDir);
+            if (!dir.exists())
+                dir.mkdirs();
+
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir + fileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+            return filePath.toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not store file", e);
+        }
     }
 
     // public List<Claim> getAllClaims() {
@@ -164,8 +209,33 @@ public class ClaimService {
         }).collect(Collectors.toList());
     }
 
-    public Claim getClaimById(int claimId) {
-        return claimDao.findById(claimId).orElseThrow(() -> new DataNotFoundException("Invalid Claim Id"));
+    public ClaimWithImageUrls getClaimById(int claimId) {
+        Claim claim = claimDao.findById(claimId).orElseThrow(() -> new DataNotFoundException("Invalid Claim Id"));
+        List<ClaimImage> images = claimImageDao.findByClaimId(claim.getId());
+        ClaimWithImageUrls claimWithImageUrls = new ClaimWithImageUrls();
+        claimWithImageUrls.setId(claim.getId());
+        claimWithImageUrls.setPolicyId(claim.getPolicyId());
+        claimWithImageUrls.setCustomerId(claim.getCustomerId());
+        claimWithImageUrls.setClaimNumber(claim.getClaimNumber());
+        claimWithImageUrls.setRequestedAmount(claim.getRequestedAmount());
+        claimWithImageUrls.setDescription(claim.getDescription());
+        claimWithImageUrls.setIncidentDate(claim.getIncidentDate());
+        claimWithImageUrls.setStatus(claim.getStatus());
+        claimWithImageUrls.setRemarks(claim.getRemarks());
+
+        // List<String> filePaths = (images != null && !images.isEmpty())
+        // ? images.stream().map(ClaimImage::getFilePath).toList()
+        // : Collections.emptyList();
+
+        List<String> filePaths = (images != null && !images.isEmpty())
+                ? images.stream()
+                        .map(img -> img.getFilePath().replace("\\", "/"))
+                        .toList()
+                : Collections.emptyList();
+
+        claimWithImageUrls.setImages(filePaths);
+
+        return claimWithImageUrls;
     }
 
     public CreateUpdateResponse updateClaimStatus(int claimId, UpdateClaimRequest requestBody) {
@@ -173,6 +243,12 @@ public class ClaimService {
                 .orElseThrow(() -> new DataNotFoundException("Invalid Claim ID"));
         existingClaim.setStatus(requestBody.getStatus());
         existingClaim.setRemarks(requestBody.getRemarks());
+
+        // Check if approvedAmount is provided in the request
+        if (requestBody.getApprovedAmount() != null) {
+            existingClaim.setApprovedAmount(requestBody.getApprovedAmount());
+        }
+
         Claim updatedClaim = claimDao.save(existingClaim);
         return new CreateUpdateResponse(updatedClaim.getId(), "Claim Status Updated Successfully!");
     }
