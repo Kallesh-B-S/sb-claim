@@ -37,6 +37,15 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, Object>> handleBadRequest(RuntimeException ex) {
+        if (ex.getMessage().equalsIgnoreCase("Error saving files: No Image found to add")
+                || (ex.getMessage().equalsIgnoreCase("No Image found to add"))){
+            return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+        }
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    }
+
     // 4. Handle Type Mismatch (e.g., passing "abc" for an Integer ID)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {

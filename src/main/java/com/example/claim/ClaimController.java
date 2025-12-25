@@ -31,12 +31,20 @@ public class ClaimController {
     @Autowired
     ClaimService claimService;
 
-    @PostMapping( consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CreateUpdateResponse> createClaim(
             @RequestPart("requestBody") CreateClaimRequest requestBody,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
         CreateUpdateResponse response = claimService.createClaim(requestBody, images);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping(path = "addImages/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CreateUpdateResponse> addImagesToClaim(
+            @RequestPart(value = "images", required = true) List<MultipartFile> images,
+            @PathVariable("id") Integer clientId) {
+        CreateUpdateResponse response = claimService.addImagesToClaim(images, clientId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     // @GetMapping

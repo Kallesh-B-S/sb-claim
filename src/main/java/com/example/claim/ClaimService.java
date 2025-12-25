@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.*;
 
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
@@ -113,6 +114,40 @@ public class ClaimService {
         } catch (IOException e) {
             throw new RuntimeException("Could not store file", e);
         }
+    }
+
+    // Remove "throws Exception"
+    public CreateUpdateResponse addImagesToClaim(List<MultipartFile> images, int clientId) {
+        try {
+            if (images == null || images.isEmpty()) {
+                // This is a RuntimeException, it doesn't need to be declared in the signature
+                throw new BadRequestException("No Image found to add");
+            }
+
+            System.out.println("--------------- : "+images.size());
+
+            for (MultipartFile file : images) {
+                if (file.isEmpty()){
+                    throw new BadRequestException("No Image found to add");
+                    // continue;
+                }
+
+                String path = saveFileToDisk(file, clientId);
+
+                ClaimImage img = new ClaimImage();
+                img.setFilePath(path);
+                img.setClaimId(clientId);
+                claimImageDao.save(img);
+            }
+        } catch (com.example.claim.exception.BadRequestException e) {
+            // Re-throw your custom exception so the @ExceptionHandler catches it
+            throw e;
+        } catch (Exception e) {
+            // Wrap generic exceptions in a RuntimeException or handle them
+            throw new RuntimeException("Error saving files: " + e.getMessage());
+        }
+
+        return new CreateUpdateResponse(null, "Images Added Successfully!");
     }
 
     // public List<Claim> getAllClaims() {
